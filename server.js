@@ -5,6 +5,7 @@ import data from "./data.js";
 dotenv.config();
 
 const app = express();
+app.disable("x-powered-by");
 const PORT = process.env.PORT;
 
 app.get("/api/products/:id", (req, res) => {
