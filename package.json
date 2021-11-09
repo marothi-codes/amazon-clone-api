@@ -1,7 +1,7 @@
 {
   "name": "amazon-clone-api",
   "type": "module",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "The Node.js express server backend for the Amazon Clone 2.0, this serves as the Firebase replace used in version 1.0 with the objective of flexing my full-stack biceps at the onlookers. Hopefully I smash the project and build a banger haha...",
   "main": "server.js",
   "scripts": {
@@ -29,8 +29,11 @@
   },
   "homepage": "https://github.com/marothi-codes/amazon-clone-api#readme",
   "dependencies": {
+    "bcryptjs": "^2.4.3",
     "dotenv": "^10.0.0",
     "express": "^4.17.1",
+    "express-async-handler": "^1.1.4",
+    "mongoose": "^5.10.7",
     "nodemon": "^2.0.14",
     "save-dev": "^0.0.1-security"
   }
