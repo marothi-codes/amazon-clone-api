@@ -7,6 +7,11 @@ import productRouter from "./routers/productRouter.js";
 dotenv.config();
 
 const app = express();
+
+// Middleware...
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+
 mongoose.connect(
   process.env.MONGODB_URL || "mongodb://localhost/amazon-clone-2",
   {
@@ -16,8 +21,10 @@ mongoose.connect(
   }
 );
 
+// HTTP Header config.
 app.disable("x-powered-by");
 
+// Routes.
 app.use("/api/users", userRouter);
 app.use("/api/products", productRouter);
 
