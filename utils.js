@@ -14,3 +14,18 @@ export const generateToken = (user) => {
     }
   );
 };
+
+export const isAuthenticated = (req, res, next) => {
+  const authorisation = req.headers.authorization;
+
+  if (authorisation) {
+    const token = authorisation.slice(7, authorisation.length); // Bearer XXXXX
+    jwt.verify(token, process.env.JWT_SECRET, (err, decode) => {
+      if (err) res.status(401).send({ message: "Invalid token" });
+      else {
+        req.user = decode;
+        next();
+      }
+    });
+  } else res.status(401).send({ message: "No token found." });
+};
