@@ -5,6 +5,15 @@ import { isAuthenticated } from "../utils.js";
 
 const orderRouter = express.Router();
 
+orderRouter.get(
+  "/history",
+  isAuthenticated,
+  expressAsyncHandler(async (req, res) => {
+    const orders = await Order.find({ user: req.user._id });
+    res.send(orders);
+  })
+);
+
 orderRouter.post(
   "/",
   isAuthenticated,
