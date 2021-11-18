@@ -58,4 +58,16 @@ userRouter.post(
   })
 );
 
+userRouter.get(
+  "/:id",
+  expressAsyncHandler(async (req, res) => {
+    const user = await User.findById(req.params.id);
+    if (user) res.send(user);
+    else
+      res
+        .status(400)
+        .send({ message: "The user you've specified does not exist." });
+  })
+);
+
 export default userRouter;
