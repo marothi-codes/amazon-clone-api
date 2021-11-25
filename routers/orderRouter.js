@@ -1,9 +1,19 @@
 import express from "express";
 import expressAsyncHandler from "express-async-handler";
 import Order from "../models/orderModel.js";
-import { isAuthenticated } from "../utils.js";
+import { isAdmin, isAuthenticated } from "../utils.js";
 
 const orderRouter = express.Router();
+
+orderRouter.get(
+  "/",
+  isAuthenticated,
+  isAdmin,
+  expressAsyncHandler(async (req, res) => {
+    const orders = await Order.find({}).populate("user", "name");
+    res.send(orders);
+  })
+);
 
 orderRouter.get(
   "/history",
@@ -43,7 +53,11 @@ orderRouter.get(
   expressAsyncHandler(async (req, res) => {
     const order = await Order.findById(req.params.id);
     if (order) res.send(order);
-    else res.status(400).send({ message: "Order not found." });
+    else
+      res.status(400).send({
+        message:
+          "HTTP Status Code: 400 (Bad Request) - The order specified does not exist...",
+      });
   })
 );
 
@@ -64,7 +78,49 @@ orderRouter.put(
       };
       const updatedOrder = await order.save();
       res.send({ message: "Order Paid", order: updatedOrder });
-    } else res.status(400).send({ message: "Order specified not found." });
+    } else
+      res.status(400).send({
+        message:
+          "HTTP Status Code: 400 (Bad Request) - The order specified does not exist...",
+      });
+  })
+);
+
+orderRouter.put(
+  "/:id/deliver",
+  isAuthenticated,
+  isAdmin,
+  expressAsyncHandler(async (req, res) => {
+    const order = await Order.findById(req.params.id);
+    if (order) {
+      order.isDelivered = true;
+      order.deliveredAt = Date.now();
+
+      const updatedOrder = await order.save();
+      res.send({ message: "Order marked as delivered", order: updatedOrder });
+    } else
+      res.status(400).send({
+        message:
+          "HTTP Status Code: 400 (Bad Request) - The order specified does not exist...",
+      });
+  })
+);
+
+orderRouter.delete(
+  "/:id",
+  isAuthenticated,
+  isAdmin,
+  expressAsyncHandler(async (req, res) => {
+    const order = await Order.findById(req.params.id);
+    if (order) {
+      const orderToDelete = await order.remove();
+      res.send({ message: "Order deleted", order: orderToDelete });
+    } else {
+      res.status(400).send({
+        message:
+          "HTTP Status Code: 400 (Bad Request) - The order specified does not exist...",
+      });
+    }
   })
 );
 

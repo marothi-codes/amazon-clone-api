@@ -19,14 +19,11 @@ app.use(express.static("public"));
 // HTTP Header config.
 app.disable("x-powered-by");
 
-mongoose.connect(
-  process.env.MONGODB_URL || "mongodb://localhost/amazon-clone-2",
-  {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-    useCreateIndex: true,
-  }
-);
+mongoose.connect(process.env.MONGODB_URL, {
+  useNewUrlParser: true,
+  useUnifiedTopology: true,
+  useCreateIndex: true,
+});
 
 // Routes.
 app.use("/api/uploads", uploadRouter);

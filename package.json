@@ -1,7 +1,7 @@
 {
   "name": "amazon-clone-api",
   "type": "module",
-  "version": "0.7.0",
+  "version": "0.7.1",
   "description": "The Node.js express server backend for the Amazon Clone 2.0, this serves as the Firebase replace used in version 1.0 with the objective of flexing my full-stack biceps at the onlookers. Hopefully I smash the project and build a banger haha...",
   "main": "server.js",
   "scripts": {
