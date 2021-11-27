@@ -1,11 +1,44 @@
 import express from "express";
 import expressAsyncHandler from "express-async-handler";
+import mongoose from "mongoose";
 import User from "../models/userModel.js";
 import data from "../data.js";
 import bcrypt from "bcryptjs";
-import { generateToken, isAuthenticated } from "../utils.js";
+import { generateToken, isAdmin, isAuthenticated } from "../utils.js";
 
 const userRouter = express.Router();
+
+const _400_ERROR =
+  "HTTP Status Code: 400 (Bad Request) - The user specified does not exist. Check the id URL parameter for typos...";
+
+userRouter.post(
+  "/sign-up",
+  expressAsyncHandler(async (req, res) => {
+    const user = new User({
+      name: req.body.name,
+      email: req.body.email,
+      password: bcrypt.hashSync(req.body.password, 8),
+    });
+    const newUser = await user.save();
+    res.send({
+      _id: newUser._id,
+      name: newUser.name,
+      email: newUser.email,
+      isAdmin: newUser.isAdmin,
+      token: generateToken(newUser),
+    });
+  })
+);
+
+userRouter.get(
+  "/",
+  isAuthenticated,
+  isAdmin,
+  expressAsyncHandler(async (req, res) => {
+    const users = await User.find({});
+    res.send(users);
+  })
+);
 
 userRouter.get(
   "/seed",
@@ -39,25 +72,6 @@ userRouter.post(
   })
 );
 
-userRouter.post(
-  "/sign-up",
-  expressAsyncHandler(async (req, res) => {
-    const user = new User({
-      name: req.body.name,
-      email: req.body.email,
-      password: bcrypt.hashSync(req.body.password, 8),
-    });
-    const newUser = await user.save();
-    res.send({
-      _id: newUser._id,
-      name: newUser.name,
-      email: newUser.email,
-      isAdmin: newUser.isAdmin,
-      token: generateToken(newUser),
-    });
-  })
-);
-
 userRouter.get(
   "/:id",
   expressAsyncHandler(async (req, res) => {
@@ -71,15 +85,36 @@ userRouter.get(
 );
 
 userRouter.put(
-  "/profile",
+  "/:id",
+  isAuthenticated,
+  isAdmin,
+  expressAsyncHandler(async (req, res) => {
+    const user = await User.findById(req.params.id);
+    if (user) {
+      user.name = req.body.name === user.name ? user.name : req.body.name;
+      user.isAdmin =
+        req.body.isAdmin === user.isAdmin ? user.isAdmin : req.body.isAdmin;
+      user.isSeller =
+        req.body.isSeller === user.isSeller ? user.isSeller : req.body.isSeller;
+      const updatedUser = await user.save();
+      res.send({ message: "User updated successfully.", user: updatedUser });
+    } else res.status(400).send({ message: _400_ERROR });
+  })
+);
+
+userRouter.put(
+  "/profile/:id",
   isAuthenticated,
   expressAsyncHandler(async (req, res) => {
-    const user = await User.findById(req.user._id);
+    const id = mongoose.Types.ObjectId(req.params.id);
+    const user = await User.findById(id);
+
     if (user) {
-      user.name = req.body.name || user.name;
-      user.email = req.body.email || user.email;
-      if (req.body.password)
+      user.name = req.body.name === user.name ? user.name : req.body.name;
+      user.email = req.body.email === user.email ? user.email : req.body.email;
+      if (req.body.password) {
         user.password = bcrypt.hashSync(req.body.password, 8);
+      }
 
       const updatedUser = await user.save();
 
@@ -91,6 +126,25 @@ userRouter.put(
         token: generateToken(updatedUser),
       });
     }
+  })
+);
+
+userRouter.delete(
+  "/:id",
+  isAuthenticated,
+  isAdmin,
+  expressAsyncHandler(async (req, res) => {
+    const user = await User.findById(req.params.id);
+    if (user) {
+      if (user.isAdmin) {
+        res.status(401).send({
+          message: "You're not allowed to delete users in the admin role.",
+        });
+        return;
+      }
+      const deletedUser = await user.remove();
+      res.send({ message: "User successfully deleted.", user: deletedUser });
+    } else res.status(400).send({ message: _400_ERROR });
   })
 );
 
