@@ -25,6 +25,7 @@ userRouter.post(
       name: newUser.name,
       email: newUser.email,
       isAdmin: newUser.isAdmin,
+      isSeller: newUser.isSeller,
       token: generateToken(newUser),
     });
   })
@@ -61,6 +62,7 @@ userRouter.post(
           name: user.name,
           email: user.email,
           isAdmin: user.isAdmin,
+          isSeller: user.isSeller,
           token: generateToken(user),
         });
         return;
@@ -112,6 +114,22 @@ userRouter.put(
     if (user) {
       user.name = req.body.name === user.name ? user.name : req.body.name;
       user.email = req.body.email === user.email ? user.email : req.body.email;
+
+      if (user.isSeller) {
+        user.seller.name =
+          req.body.sellerName === user.seller.name
+            ? user.seller.name
+            : req.body.sellerName;
+        user.seller.logo =
+          req.body.sellerLogo === user.seller.logo
+            ? user.seller.logo
+            : req.body.sellerLogo;
+        user.seller.description =
+          req.body.sellerDescription === user.seller.description
+            ? user.seller.description
+            : req.body.sellerDescription;
+      }
+
       if (req.body.password) {
         user.password = bcrypt.hashSync(req.body.password, 8);
       }
@@ -123,6 +141,7 @@ userRouter.put(
         name: updatedUser.name,
         email: updatedUser.email,
         isAdmin: updatedUser.isAdmin,
+        isSeller: updatedUser.isSeller,
         token: generateToken(updatedUser),
       });
     }

@@ -7,6 +7,7 @@ export const generateToken = (user) => {
       name: user.name,
       email: user.email,
       isAdmin: user.isAdmin,
+      isSeller: user.isSeller,
     },
     process.env.JWT_SECRET,
     {
@@ -19,7 +20,7 @@ export const isAuthenticated = (req, res, next) => {
   const authorisation = req.headers.authorization;
 
   if (authorisation) {
-    const token = authorisation.slice(7, authorisation.length); // Bearer XXXXX
+    const token = authorisation.slice(7, authorisation.length);
     jwt.verify(token, process.env.JWT_SECRET, (err, decode) => {
       if (err) res.status(401).send({ message: "Invalid token" });
       else {
@@ -36,4 +37,17 @@ export const isAdmin = (req, res, next) => {
     res
       .status(401)
       .send({ message: "You're unauthorized to access this content." });
+};
+
+export const isSeller = (req, res, next) => {
+  if (req.user && req.user.isSeller) next();
+  else res.status(401).send({ message: "Invalid or expired seller token." });
+};
+
+export const isSellerOrAdmin = (req, res, next) => {
+  if (req.user && (req.user.isSeller || req.user.isAdmin)) next();
+  else
+    res
+      .status(401)
+      .send({ message: "Invalid or expired Admin or Seller token." });
 };
