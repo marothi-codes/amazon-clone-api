@@ -7,12 +7,22 @@ const data = {
       email: "web@localhost.io",
       password: bcrypt.hashSync("vzp46@BXD$", 8),
       isAdmin: true,
+      isSeller: false,
     },
     {
       name: "John",
       email: "user@example.com",
       password: bcrypt.hashSync("vzp46@BXD$", 8),
       isAdmin: false,
+      isSeller: true,
+
+      seller: {
+        name: "Adidas",
+        logo: "/images/logo1.png",
+        description: "best seller",
+        rating: 4.5,
+        numReviews: 120,
+      },
     },
   ],
   products: [
