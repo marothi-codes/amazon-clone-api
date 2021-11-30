@@ -1,6 +1,7 @@
 import express from "express";
 import expressAsyncHandler from "express-async-handler";
 import Product from "../models/productModel.js";
+import mongoose from "mongoose";
 import data from "../data.js";
 import { isAdmin, isAuthenticated, isSellerOrAdmin } from "../utils.js";
 
@@ -103,6 +104,47 @@ productRouter.post(
     });
     const newProduct = await product.save();
     res.send({ message: "Product Added.", product: newProduct });
+  })
+);
+
+productRouter.post(
+  "/:id/reviews",
+  isAuthenticated,
+  expressAsyncHandler(async (req, res) => {
+    const productId = mongoose.Types.ObjectId(req.params.id);
+    const product = await Product.findById(productId);
+
+    if (product) {
+      if (product.reviews.find((x) => x.name === req.user.name)) {
+        res
+          .status(400)
+          .send({ message: "You've already submitted your review." });
+      }
+
+      const review = {
+        name: req.user.name,
+        rating: Number(req.body.rating),
+        comment: req.body.comment,
+      };
+
+      product.reviews.push(review);
+      product.numReviews = product.reviews.length;
+      product.rating =
+        product.reviews.reduce((acc, item) => item.rating + acc, 0) /
+        product.reviews.length;
+
+      const updatedProduct = await product.save();
+
+      res.status(201).send({
+        message: "Review submitted.",
+        review: updatedProduct.reviews[updatedProduct.reviews.length - 1],
+      });
+    } else {
+      res.status(400).send({
+        message:
+          "HTTP Status Code: 400 (Bad Request) - The product specified does not exist.",
+      });
+    }
   })
 );
 
