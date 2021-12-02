@@ -29,6 +29,7 @@
   },
   "homepage": "https://github.com/marothi-codes/amazon-clone-api#readme",
   "dependencies": {
+    "aws-sdk": "^2.702.0",
     "bcryptjs": "^2.4.3",
     "dotenv": "^10.0.0",
     "express": "^4.17.1",
@@ -37,6 +38,7 @@
     "mailgun-js": "^0.22.0",
     "mongoose": "^5.10.8",
     "multer": "^1.4.2",
+    "multer-s3": "^2.9.0",
     "nodemon": "^2.0.14",
     "save-dev": "^0.0.1-security"
   }
