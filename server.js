@@ -21,11 +21,8 @@ app.use(express.static("public"));
 // HTTP Header config.
 app.disable("x-powered-by");
 
-mongoose.connect(process.env.MONGODB_URL, {
-  useNewUrlParser: true,
-  useUnifiedTopology: true,
-  useCreateIndex: true,
-});
+// Connect mongoose ODM to MongoDB.
+mongoose.connect(process.env.MONGODB_URL);
 
 // Routes.
 app.use("/api/uploads", uploadRouter);

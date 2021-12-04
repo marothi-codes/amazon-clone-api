@@ -3,13 +3,7 @@ import expressAsyncHandler from "express-async-handler";
 import Order from "../models/orderModel.js";
 import Product from "../models/productModel.js";
 import User from "../models/userModel.js";
-import {
-  isAdmin,
-  isAuthenticated,
-  isSellerOrAdmin,
-  mailgun,
-  payOrderEmailTemplate,
-} from "../utils.js";
+import { isAdmin, isAuthenticated, isSellerOrAdmin } from "../utils.js";
 
 const orderRouter = express.Router();
 
@@ -56,7 +50,7 @@ orderRouter.get(
         $group: {
           _id: { $dateToString: { format: "%Y-%m-%d", date: "$createdAt" } },
           orders: { $sum: 1 },
-          sales: { $sum: "$totalPrice" },
+          sales: { $sum: "$total" },
         },
       },
       { $sort: { _id: 1 } },
@@ -139,21 +133,6 @@ orderRouter.put(
         email_address: req.body.email_address,
       };
       const updatedOrder = await order.save();
-
-      mailgun()
-        .messages()
-        .send(
-          {
-            from: `Amazon <marothi.codes@gmail.com>`,
-            to: `${order.user.name}, hlakzin.m@gmail.com`,
-            subject: `Order Receipt ${order._id}`,
-            html: payOrderEmailTemplate(order),
-          },
-          (err, body) => {
-            if (err) console.log(err);
-            else console.log(body);
-          }
-        );
 
       res.send({ message: "Order Paid", order: updatedOrder });
     } else
