@@ -81,22 +81,6 @@ productRouter.get(
   })
 );
 
-productRouter.get(
-  "/:id",
-  expressAsyncHandler(async (req, res) => {
-    const product = await Product.findById(req.params.id).populate(
-      "seller",
-      "seller.name seller.logo seller.rating seller.numReviews"
-    );
-    if (product) res.send(product);
-    else
-      res.status(400).send({
-        message:
-          "HTTP Status Code: 400 (Bad Request) - The product specified does not exist.",
-      });
-  })
-);
-
 productRouter.post(
   "/",
   isAuthenticated,
@@ -157,6 +141,22 @@ productRouter.post(
           "HTTP Status Code: 400 (Bad Request) - The product specified does not exist.",
       });
     }
+  })
+);
+
+productRouter.get(
+  "/:id",
+  expressAsyncHandler(async (req, res) => {
+    const product = await Product.findById(req.params.id).populate(
+      "seller",
+      "seller.name seller.logo seller.rating seller.numReviews"
+    );
+    if (product) res.send(product);
+    else
+      res.status(400).send({
+        message:
+          "HTTP Status Code: 400 (Bad Request) - The product specified does not exist.",
+      });
   })
 );
 

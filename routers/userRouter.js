@@ -84,36 +84,6 @@ userRouter.post(
   })
 );
 
-userRouter.get(
-  "/:id",
-  expressAsyncHandler(async (req, res) => {
-    const user = await User.findById(req.params.id);
-    if (user) res.send(user);
-    else
-      res
-        .status(400)
-        .send({ message: "The user you've specified does not exist." });
-  })
-);
-
-userRouter.put(
-  "/:id",
-  isAuthenticated,
-  isAdmin,
-  expressAsyncHandler(async (req, res) => {
-    const user = await User.findById(req.params.id);
-    if (user) {
-      user.name = req.body.name === user.name ? user.name : req.body.name;
-      user.isAdmin =
-        req.body.isAdmin === user.isAdmin ? user.isAdmin : req.body.isAdmin;
-      user.isSeller =
-        req.body.isSeller === user.isSeller ? user.isSeller : req.body.isSeller;
-      const updatedUser = await user.save();
-      res.send({ message: "User updated successfully.", user: updatedUser });
-    } else res.status(400).send({ message: _400_ERROR });
-  })
-);
-
 userRouter.put(
   "/profile/:id",
   isAuthenticated,
@@ -155,6 +125,36 @@ userRouter.put(
         token: generateToken(updatedUser),
       });
     }
+  })
+);
+
+userRouter.get(
+  "/:id",
+  expressAsyncHandler(async (req, res) => {
+    const user = await User.findById(req.params.id);
+    if (user) res.send(user);
+    else
+      res
+        .status(400)
+        .send({ message: "The user you've specified does not exist." });
+  })
+);
+
+userRouter.put(
+  "/:id",
+  isAuthenticated,
+  isAdmin,
+  expressAsyncHandler(async (req, res) => {
+    const user = await User.findById(req.params.id);
+    if (user) {
+      user.name = req.body.name === user.name ? user.name : req.body.name;
+      user.isAdmin =
+        req.body.isAdmin === user.isAdmin ? user.isAdmin : req.body.isAdmin;
+      user.isSeller =
+        req.body.isSeller === user.isSeller ? user.isSeller : req.body.isSeller;
+      const updatedUser = await user.save();
+      res.send({ message: "User updated successfully.", user: updatedUser });
+    } else res.status(400).send({ message: _400_ERROR });
   })
 );
 

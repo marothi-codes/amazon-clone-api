@@ -143,6 +143,24 @@ orderRouter.put(
   })
 );
 
+orderRouter.delete(
+  "/:id",
+  isAuthenticated,
+  isAdmin,
+  expressAsyncHandler(async (req, res) => {
+    const order = await Order.findById(req.params.id);
+    if (order) {
+      const orderToDelete = await order.remove();
+      res.send({ message: "Order deleted", order: orderToDelete });
+    } else {
+      res.status(400).send({
+        message:
+          "HTTP Status Code: 400 (Bad Request) - The order specified does not exist...",
+      });
+    }
+  })
+);
+
 orderRouter.put(
   "/:id/deliver",
   isAuthenticated,
@@ -160,24 +178,6 @@ orderRouter.put(
         message:
           "HTTP Status Code: 400 (Bad Request) - The order specified does not exist...",
       });
-  })
-);
-
-orderRouter.delete(
-  "/:id",
-  isAuthenticated,
-  isAdmin,
-  expressAsyncHandler(async (req, res) => {
-    const order = await Order.findById(req.params.id);
-    if (order) {
-      const orderToDelete = await order.remove();
-      res.send({ message: "Order deleted", order: orderToDelete });
-    } else {
-      res.status(400).send({
-        message:
-          "HTTP Status Code: 400 (Bad Request) - The order specified does not exist...",
-      });
-    }
   })
 );
 
